@@ -25,7 +25,8 @@ class RequestSignature {
         val documentContent = RequestSignature::class.java.getResource("/document.txt")?.readText()
             ?: throw RuntimeException("unable to load document.txt")
 
-        val documentId = documentContent.lines()[0].last().toString()
+        val versionLine = documentContent.lines()[0]
+        val documentId = versionLine.last().toString()
 
         val properties = Properties().apply {
             val appConfig = RequestSignature::class.java.getResourceAsStream("/app.config")
@@ -83,7 +84,7 @@ class RequestSignature {
         }
 
         val envelopeDefinition = EnvelopeDefinition().apply {
-            emailSubject = "Please sign this document"
+            emailSubject = "Please sign to approve: $versionLine"
             status = "sent"
             setRecipients(recipients)
             documents = listOf(document)

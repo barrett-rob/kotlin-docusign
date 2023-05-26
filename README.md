@@ -5,7 +5,9 @@ To run:
 
 1. sign up for a docusign developer account
 2. get a clientId, userId and private key
-3run using `./gradlew :request-signature:run` or your favourite IDE
+3. Run using:
+    1. `./gradlew :request-signature:run` or your favourite IDE
+    2. `./gradlew :signature-status:run` or your favourite IDE
 
 Setup:
 
