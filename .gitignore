@@ -27,3 +27,8 @@ replay_pid*
 .gradle
 downloaded-jwt-console-app
 .DS_Store
+build
+
+# credentials
+app.config
+private.key
