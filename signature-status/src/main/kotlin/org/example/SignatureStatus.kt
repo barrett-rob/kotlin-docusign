@@ -46,7 +46,7 @@ class SignatureStatus {
 
         val envelopesApi = EnvelopesApi(apiClient)
         val listStatusChangesOptions = envelopesApi.ListStatusChangesOptions().apply {
-            fromDate = DateTimeFormatter.ISO_DATE.format(LocalDate.now().minusMonths(6))
+            fromDate = DateTimeFormatter.ISO_DATE.format(LocalDate.now().minusDays(2))
             include = "recipients"
         }
 
@@ -59,10 +59,10 @@ class SignatureStatus {
         println(extractInfo(listStatusChanges).joinToString("\n"))
     }
 
-    private fun extractInfo(listStatusChanges: EnvelopesInformation) =
-        listStatusChanges.envelopes.map { envelope ->
+    private fun extractInfo(envelopesInformation: EnvelopesInformation?) =
+        envelopesInformation?.envelopes?.map { envelope ->
             val signers = envelope.recipients?.signers?.joinToString(",") { signer -> signer.email }
-            "\t${envelope.status} - ${envelope.emailSubject} - $signers"
-        }
+            "\t${envelope.status} - ${envelope.envelopeId} - ${envelope.emailSubject} - $signers"
+        } ?: listOf("\tNo envelopes found")
 
 }

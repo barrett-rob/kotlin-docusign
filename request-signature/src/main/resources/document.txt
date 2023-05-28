@@ -1,5 +1,8 @@
-Version 1
+Version 3
 
 Please approve this version with items:
 
 Item 1: $1000.00
+Item 2: $2000.00
+Item 3: $3000.00
+
