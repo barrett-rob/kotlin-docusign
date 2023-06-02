@@ -2,6 +2,7 @@ package org.example
 
 import com.docusign.esign.api.EnvelopesApi
 import com.docusign.esign.client.ApiClient
+import com.docusign.esign.model.EnvelopeId
 import com.docusign.esign.model.EnvelopesInformation
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -46,7 +47,7 @@ class SignatureStatus {
 
         val envelopesApi = EnvelopesApi(apiClient)
         val listStatusChangesOptions = envelopesApi.ListStatusChangesOptions().apply {
-            fromDate = DateTimeFormatter.ISO_DATE.format(LocalDate.now().minusDays(2))
+            fromDate = DateTimeFormatter.ISO_DATE.format(LocalDate.now().minusDays(7))
             include = "recipients"
         }
 
@@ -57,6 +58,20 @@ class SignatureStatus {
 
         println("signature status:")
         println(extractInfo(listStatusChanges).joinToString("\n"))
+
+        val listAuditEvents = listStatusChanges.envelopes.associate { envelope ->
+            envelope.envelopeId to envelopesApi.listAuditEvents(
+                /* accountId = */ accountId,
+                /* envelopeId = */ envelope.envelopeId
+            ).auditEvents.map { envelopeAuditEvent ->
+                envelopeAuditEvent.eventFields.map { nameValue ->
+                    nameValue.name to nameValue.value
+                }
+            }
+        }
+
+        println("audit events:")
+        println(extractInfo(listAuditEvents).joinToString("\n"))
     }
 
     private fun extractInfo(envelopesInformation: EnvelopesInformation?) =
@@ -64,5 +79,15 @@ class SignatureStatus {
             val signers = envelope.recipients?.signers?.joinToString(",") { signer -> signer.email }
             "\t${envelope.status} - ${envelope.envelopeId} - ${envelope.emailSubject} - $signers"
         } ?: listOf("\tNo envelopes found")
+
+    private fun extractInfo(auditEventsByEnvelopeId: Map<String, List<List<Pair<String, String>>>>): List<String> {
+        return auditEventsByEnvelopeId.entries.map { entry ->
+            "${entry.key}: " + entry.value.map { list ->
+                list.map { pair ->
+                    "\n\t${pair.first} = ${pair.second}"
+                }
+            }
+        }
+    }
 
 }
